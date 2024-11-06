@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hiragana Learning App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      background-color: #f5f5f5;
+      flex-direction: column;
+    }
+    .card {
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #fff;
+    }
+    .character {
+      font-size: 64px;
+      margin: 20px 0;
+    }
+    .input-section {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .results-table {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .results-table th, .results-table td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <h1>Hiragana Learning App</h1>
+    <div class="character" id="hiragana-character">あ</div>
+    <div class="input-section">
+      <input type="text" id="answer-input" placeholder="Enter romaji (e.g., a)">
+      <button onclick="checkAnswer()">Check Answer</button>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Hiragana character list
+    const hiragana = [
+      { char: "あ", romaji: "a" },
+      { char: "い", romaji: "i" },
+      { char: "う", romaji: "u" },
+      { char: "え", romaji: "e" },
+      { char: "お", romaji: "o" },
+      { char: "か", romaji: "ka" },
+      { char: "き", romaji: "ki" },
+      { char: "く", romaji: "ku" },
+      { char: "け", romaji: "ke" },
+      { char: "こ", romaji: "ko" },
+      { char: "さ", romaji: "sa" },
+      { char: "し", romaji: "shi" },
+      { char: "す", romaji: "su" },
+      { char: "せ", romaji: "se" },
+      { char: "そ", romaji: "so" },
+      { char: "た", romaji: "ta" },
+      { char: "ち", romaji: "chi" },
+      { char: "つ", romaji: "tsu" },
+      { char: "て", romaji: "te" },
+      { char: "と", romaji: "to" },
+      { char: "な", romaji: "na" },
+      { char: "に", romaji: "ni" },
+      { char: "ぬ", romaji: "nu" },
+      { char: "ね", romaji: "ne" },
+      { char: "の", romaji: "no" },
+      { char: "は", romaji: "ha" },
+      { char: "ひ", romaji: "hi" },
+      { char: "ふ", romaji: "fu" },
+      { char: "へ", romaji: "he" },
+      { char: "ほ", romaji: "ho" },
+      { char: "ま", romaji: "ma" },
+      { char: "み", romaji: "mi" },
+      { char: "む", romaji: "mu" },
+      { char: "め", romaji: "me" },
+      { char: "も", romaji: "mo" },
+      { char: "や", romaji: "ya" },
+      { char: "ゆ", romaji: "yu" },
+      { char: "よ", romaji: "yo" },
+      { char: "ら", romaji: "ra" },
+      { char: "り", romaji: "ri" },
+      { char: "る", romaji: "ru" },
+      { char: "れ", romaji: "re" },
+      { char: "ろ", romaji: "ro" },
+      { char: "わ", romaji: "wa" },
+      { char: "を", romaji: "wo" },
+      { char: "ん", romaji: "n" }
+    ];
+
+    let currentCharacter = {};
+    let shuffledHiragana = [];
+    let results = [];
+
+    // Shuffle array (Fisher-Yates Shuffle)
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Function to display a random Hiragana character without repetition
+    function showRandomCharacter() {
+      if (shuffledHiragana.length === 0) {
+        // Display results if queue is empty
+        showResults();
+        return;
+      }
+
+      // Get the next character
+      currentCharacter = shuffledHiragana.pop();
+      document.getElementById("hiragana-character").textContent = currentCharacter.char;
+      document.getElementById("result").textContent = "";
+      document.getElementById("answer-input").value = "";
+      document.getElementById("answer-input").focus();
+    }
+
+    // Function to check the user's answer
+    function checkAnswer() {
+      const answer = document.getElementById("answer-input").value.trim().toLowerCase();
+      const resultElement = document.getElementById("result");
+      const isCorrect = answer === currentCharacter.romaji;
+
+      // Store the result
+      results.push({ char: currentCharacter.char, answer: answer, romaji: currentCharacter.romaji, correct: isCorrect });
+
+      if (isCorrect) {
+        resultElement.textContent = "Correct! 🎉";
+        resultElement.style.color = "green";
+      } else {
+        resultElement.textContent = `Incorrect! The correct answer is "${currentCharacter.romaji}".`;
+        resultElement.style.color = "red";
+      }
+
+      setTimeout(showRandomCharacter, 1000); // Show next character after 1 second
+    }
+
+    // Function to show the results table
+    function showResults() {
+      const card = document.getElementById("card");
+      
+      const resultScore = results.reduce((sum, curr) => sum + curr.correct, 0);
+      const initLength = hiragana.length;
+      card.innerHTML = `<h2>Results ${resultScore}/${initLength} correct</h2><table class="results-table"><tr><th>Character</th><th>Your Answer</th><th>Correct answer</th><th>Result</th></tr></table>`;
+
+      const table = card.querySelector(".results-table");
+
+      results.forEach(({ char, answer, romaji, correct }) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${char}</td>
+          <td>${answer}</td>
+          <td>${romaji}</td>
+          <td style="color: ${correct ? 'green' : 'red'};">${correct ? 'Correct' : 'Incorrect'}</td>
+        `;
+        table.appendChild(row);
+      });
+
+      // Reset the queue for another round
+      shuffledHiragana = shuffle([...hiragana]);
+      results = []; // Clear results for the new round
+
+      const restartButton = document.createElement("button");
+      restartButton.textContent = "Restart";
+      restartButton.onclick = restart;
+      card.appendChild(restartButton);
+    }
+    
+    function restart () {
+      const card = document.getElementById("card");
+      card.innerHTML = `
+      <h1>Hiragana Learning App</h1>
+    <div class="character" id="hiragana-character">あ</div>
+    <div class="input-section">
+      <input type="text" id="answer-input" placeholder="Enter romaji (e.g., a)">
+      <button onclick="checkAnswer()">Check Answer</button>
+    </div>
+    <div class="result" id="result"></div>
+      `
+      showRandomCharacter();
+      document.getElementById("answer-input").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer(); // Call checkAnswer function when Enter is pressed
+      }
+    });
+    }
+
+    // Initialize game
+    shuffledHiragana = shuffle([...hiragana]);
+    showRandomCharacter();
+
+    // Event listener for the "Enter" key
+    document.getElementById("answer-input").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer(); // Call checkAnswer function when Enter is pressed
+      }
+    });
+  </script>
+</body>
+</html>
